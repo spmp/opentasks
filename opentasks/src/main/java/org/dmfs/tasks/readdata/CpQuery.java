@@ -14,25 +14,25 @@
  * limitations under the License.
  */
 
-package org.dmfs.opentaskspal.tables;
+package org.dmfs.tasks.readdata;
 
-import android.support.annotation.NonNull;
+import android.content.ContentProviderClient;
+import android.content.Context;
 
-import org.dmfs.android.contentpal.Table;
-import org.dmfs.android.contentpal.tables.BaseTable;
-import org.dmfs.android.contentpal.tables.DelegatingTable;
-import org.dmfs.tasks.contract.TaskContract;
+import org.dmfs.android.contentpal.RowSet;
 
 
 /**
- * {@link Table} for {@link TaskContract.Properties}.
+ * Represents a ContentProvider query resulting in ContentPal's {@link RowSet}.
  *
  * @author Gabor Keszthelyi
  */
-public final class PropertiesTable extends DelegatingTable<TaskContract.Properties>
+public interface CpQuery<T>
 {
-    public PropertiesTable(@NonNull String authority)
-    {
-        super(new BaseTable<>(TaskContract.Properties.getContentUri(authority)));
-    }
+
+    /**
+     * Returns the {@link RowSet} that represent the result of this query.
+     */
+    RowSet<T> rowSet(ContentProviderClient client, Context appContext);
+
 }

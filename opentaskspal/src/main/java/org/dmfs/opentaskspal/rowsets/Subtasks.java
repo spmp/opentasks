@@ -37,7 +37,7 @@ public final class Subtasks extends DelegatingRowSet<Tasks>
 {
 
     public Subtasks(@NonNull View<Tasks> view,
-                    @NonNull Projection projection,
+                    @NonNull Projection<Tasks> projection,
                     @NonNull RowReference<Tasks> parentTask)
     {
         super(new QueryRowSet<>(view, projection, new ReferringTo<>(Tasks.PARENT_ID, parentTask)));

@@ -14,25 +14,32 @@
  * limitations under the License.
  */
 
-package org.dmfs.opentaskspal.tables;
+package org.dmfs.tasks.utils.rxjava;
 
-import android.support.annotation.NonNull;
-
-import org.dmfs.android.contentpal.Table;
-import org.dmfs.android.contentpal.tables.BaseTable;
-import org.dmfs.android.contentpal.tables.DelegatingTable;
-import org.dmfs.tasks.contract.TaskContract;
+import io.reactivex.Single;
+import io.reactivex.SingleObserver;
+import io.reactivex.SingleSource;
 
 
 /**
- * {@link Table} for {@link TaskContract.Properties}.
+ * Base class for {@link Single} that delegates to a {@link SingleSource}.
  *
  * @author Gabor Keszthelyi
  */
-public final class PropertiesTable extends DelegatingTable<TaskContract.Properties>
+public abstract class DelegatingSingle<T> extends Single<T>
 {
-    public PropertiesTable(@NonNull String authority)
+    private final SingleSource<T> mDelegate;
+
+
+    protected DelegatingSingle(SingleSource<T> delegate)
     {
-        super(new BaseTable<>(TaskContract.Properties.getContentUri(authority)));
+        mDelegate = delegate;
+    }
+
+
+    @Override
+    protected final void subscribeActual(SingleObserver<? super T> observer)
+    {
+        mDelegate.subscribe(observer);
     }
 }

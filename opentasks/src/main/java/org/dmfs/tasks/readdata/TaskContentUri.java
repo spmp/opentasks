@@ -14,25 +14,38 @@
  * limitations under the License.
  */
 
-package org.dmfs.opentaskspal.tables;
+package org.dmfs.tasks.readdata;
 
-import android.support.annotation.NonNull;
+import android.content.ContentUris;
+import android.content.Context;
+import android.net.Uri;
 
-import org.dmfs.android.contentpal.Table;
-import org.dmfs.android.contentpal.tables.BaseTable;
-import org.dmfs.android.contentpal.tables.DelegatingTable;
+import org.dmfs.jems.single.Single;
+import org.dmfs.provider.tasks.AuthorityUtil;
 import org.dmfs.tasks.contract.TaskContract;
 
 
 /**
- * {@link Table} for {@link TaskContract.Properties}.
+ * Content Uri for a given task id.
  *
  * @author Gabor Keszthelyi
  */
-public final class PropertiesTable extends DelegatingTable<TaskContract.Properties>
+public final class TaskContentUri implements Single<Uri>
 {
-    public PropertiesTable(@NonNull String authority)
+    private final Long mTaskId;
+    private final Context mAppContext;
+
+
+    public TaskContentUri(Long taskId, Context context)
     {
-        super(new BaseTable<>(TaskContract.Properties.getContentUri(authority)));
+        mTaskId = taskId;
+        mAppContext = context.getApplicationContext();
+    }
+
+
+    @Override
+    public Uri value()
+    {
+        return ContentUris.withAppendedId(TaskContract.Tasks.getContentUri(AuthorityUtil.taskAuthority(mAppContext)), mTaskId);
     }
 }

@@ -14,25 +14,37 @@
  * limitations under the License.
  */
 
-package org.dmfs.opentaskspal.tables;
+package org.dmfs.tasks.utils.rxjava;
 
-import android.support.annotation.NonNull;
-
-import org.dmfs.android.contentpal.Table;
-import org.dmfs.android.contentpal.tables.BaseTable;
-import org.dmfs.android.contentpal.tables.DelegatingTable;
-import org.dmfs.tasks.contract.TaskContract;
+import io.reactivex.disposables.Disposable;
 
 
 /**
- * {@link Table} for {@link TaskContract.Properties}.
+ * {@link Disposable} that simply delegates to the given {@link Disposable}.
  *
  * @author Gabor Keszthelyi
  */
-public final class PropertiesTable extends DelegatingTable<TaskContract.Properties>
+public abstract class DelegatingDisposable implements Disposable
 {
-    public PropertiesTable(@NonNull String authority)
+    private final Disposable mDelegate;
+
+
+    protected DelegatingDisposable(Disposable delegate)
     {
-        super(new BaseTable<>(TaskContract.Properties.getContentUri(authority)));
+        mDelegate = delegate;
+    }
+
+
+    @Override
+    public final void dispose()
+    {
+        mDelegate.dispose();
+    }
+
+
+    @Override
+    public final boolean isDisposed()
+    {
+        return mDelegate.isDisposed();
     }
 }

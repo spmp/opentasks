@@ -14,25 +14,35 @@
  * limitations under the License.
  */
 
-package org.dmfs.opentaskspal.tables;
+package org.dmfs.tasks.widget;
 
-import android.support.annotation.NonNull;
-
-import org.dmfs.android.contentpal.Table;
-import org.dmfs.android.contentpal.tables.BaseTable;
-import org.dmfs.android.contentpal.tables.DelegatingTable;
-import org.dmfs.tasks.contract.TaskContract;
+import android.view.View;
+import android.view.ViewGroup;
 
 
 /**
- * {@link Table} for {@link TaskContract.Properties}.
+ * {@link PopulateableView} that simply adds the views to the provided {@link ViewGroup} as child views.
  *
  * @author Gabor Keszthelyi
  */
-public final class PropertiesTable extends DelegatingTable<TaskContract.Properties>
+public final class PopulateableViewGroup<V extends View> implements PopulateableView<V>
 {
-    public PropertiesTable(@NonNull String authority)
+    private final ViewGroup mViewGroup;
+
+
+    public PopulateableViewGroup(ViewGroup viewGroup)
     {
-        super(new BaseTable<>(TaskContract.Properties.getContentUri(authority)));
+        mViewGroup = viewGroup;
+    }
+
+
+    @Override
+    public void populate(Iterable<V> views)
+    {
+        for (V view : views)
+        {
+            mViewGroup.addView(view);
+        }
+        mViewGroup.requestLayout();
     }
 }
