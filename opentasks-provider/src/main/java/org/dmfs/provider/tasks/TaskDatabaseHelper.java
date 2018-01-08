@@ -18,16 +18,24 @@ package org.dmfs.provider.tasks;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import org.dmfs.provider.tasks.model.CursorContentValuesTaskAdapter;
+import org.dmfs.provider.tasks.model.TaskAdapter;
+import org.dmfs.provider.tasks.processors.EntityProcessor;
+import org.dmfs.provider.tasks.processors.NoOpProcessor;
+import org.dmfs.provider.tasks.processors.tasks.Instantiating;
 import org.dmfs.tasks.contract.TaskContract;
 import org.dmfs.tasks.contract.TaskContract.Properties;
 import org.dmfs.tasks.contract.TaskContract.Property.Alarm;
 import org.dmfs.tasks.contract.TaskContract.Property.Category;
 import org.dmfs.tasks.contract.TaskContract.TaskLists;
 import org.dmfs.tasks.contract.TaskContract.Tasks;
+
+import java.util.Locale;
 
 
 /**
@@ -60,7 +68,7 @@ public class TaskDatabaseHelper extends SQLiteOpenHelper
     /**
      * The database version.
      */
-    private static final int DATABASE_VERSION = 20;
+    private static final int DATABASE_VERSION = 21;
 
 
     /**
@@ -830,6 +838,36 @@ public class TaskDatabaseHelper extends SQLiteOpenHelper
             db.execSQL(SQL_CREATE_TASK_VERSION_TRIGGER);
         }
 
+        if (oldVersion < 21)
+        {
+            db.beginTransaction();
+            try
+            {
+                // make sure we upgrade the instances of every recurring task
+                EntityProcessor<TaskAdapter> processor = new Instantiating(new NoOpProcessor<>());
+                try (Cursor c = db.query(Tables.TASKS,
+                        new String[] {
+                                TaskContract.Tasks._ID, Tasks.ORIGINAL_INSTANCE_ID, Tasks.DTSTART, Tasks.DUE, Tasks.DURATION, Tasks.IS_CLOSED, Tasks.TZ,
+                                Tasks.IS_ALLDAY, Tasks.RRULE, Tasks.RDATE, Tasks.EXDATE },
+                        String.format(Locale.ENGLISH, "%s is null", TaskContract.Tasks.ORIGINAL_INSTANCE_ID),
+                        null, null, null, null))
+                {
+                    while (c.moveToNext())
+                    {
+                        ContentValues values = new ContentValues();
+                        Instantiating.addUpdateRequest(values);
+                        TaskAdapter adapter = new CursorContentValuesTaskAdapter(c, values);
+                        processor.update(db, adapter, false);
+                    }
+                }
+                db.setTransactionSuccessful();
+            }
+            finally
+            {
+                db.endTransaction();
+            }
+        }
+
         // upgrade FTS
         FTSDatabaseHelper.onUpgrade(db, oldVersion, newVersion);
 
@@ -838,4 +876,5 @@ public class TaskDatabaseHelper extends SQLiteOpenHelper
             mListener.onDatabaseUpdate(db, oldVersion, newVersion);
         }
     }
+
 }

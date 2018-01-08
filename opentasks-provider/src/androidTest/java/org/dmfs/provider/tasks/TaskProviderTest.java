@@ -33,7 +33,6 @@ import org.dmfs.android.contentpal.operations.BulkDelete;
 import org.dmfs.android.contentpal.operations.BulkUpdate;
 import org.dmfs.android.contentpal.operations.Delete;
 import org.dmfs.android.contentpal.operations.Put;
-import org.dmfs.android.contentpal.operations.Referring;
 import org.dmfs.android.contentpal.predicates.ReferringTo;
 import org.dmfs.android.contentpal.queues.BasicOperationsQueue;
 import org.dmfs.android.contentpal.rowdata.CharSequenceRowData;
@@ -50,6 +49,7 @@ import org.dmfs.opentaskspal.tables.TaskListScoped;
 import org.dmfs.opentaskspal.tables.TaskListsTable;
 import org.dmfs.opentaskspal.tables.TasksTable;
 import org.dmfs.opentaskspal.tasklists.NameData;
+import org.dmfs.opentaskspal.tasks.OriginalInstanceData;
 import org.dmfs.opentaskspal.tasks.OriginalInstanceSyncIdData;
 import org.dmfs.opentaskspal.tasks.StatusData;
 import org.dmfs.opentaskspal.tasks.SyncIdData;
@@ -732,7 +732,7 @@ public class TaskProviderTest
         assertThat(new SingletonIterable<>(
                 new Put<>(exceptionTask, new Composite<>(
                         new TitleData("task1exception"),
-                        new OriginalInstanceSyncIdData("syncId1"))
+                        new OriginalInstanceSyncIdData("syncId1", new DateTime(0)))
                 )
 
         ), resultsIn(queue,
@@ -759,20 +759,23 @@ public class TaskProviderTest
                 new Put<>(taskList, new NameData("list1")),
                 new Put<>(task, new Composite<>(
                         new TitleData("task1"),
-                        new SyncIdData("syncId1"))
-                )
+                        new SyncIdData("syncId1")))
         ));
         queue.flush();
 
+        DateTime now = DateTime.now();
+
         assertThat(new SingletonIterable<>(
-                new Referring<>(task, Tasks.ORIGINAL_INSTANCE_ID,
-                        new Put<>(exceptionTask, new TitleData("task1exception")))
+                new Put<>(exceptionTask,
+                        new Composite<>(
+                                new TitleData("task1exception"),
+                                new OriginalInstanceData(task, now)))
 
         ), resultsIn(queue,
                 new AssertRelated<>(new TasksTable(mAuthority), Tasks.ORIGINAL_INSTANCE_ID, task,
                         new Composite<>(
                                 new TitleData("task1exception"),
-                                new OriginalInstanceSyncIdData("syncId1")
+                                new OriginalInstanceSyncIdData("syncId1", now)
                         ))
         ));
     }
