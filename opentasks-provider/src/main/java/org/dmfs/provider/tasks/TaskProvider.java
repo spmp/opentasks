@@ -43,7 +43,6 @@ import org.dmfs.provider.tasks.TaskDatabaseHelper.OnDatabaseOperationListener;
 import org.dmfs.provider.tasks.TaskDatabaseHelper.Tables;
 import org.dmfs.provider.tasks.handler.PropertyHandler;
 import org.dmfs.provider.tasks.handler.PropertyHandlerFactory;
-import org.dmfs.provider.tasks.model.ContentValuesInstanceAdapter;
 import org.dmfs.provider.tasks.model.ContentValuesListAdapter;
 import org.dmfs.provider.tasks.model.ContentValuesTaskAdapter;
 import org.dmfs.provider.tasks.model.CursorContentValuesInstanceAdapter;
@@ -957,17 +956,20 @@ public final class TaskProvider extends SQLiteContentProvider implements OnAccou
 
                 break;
 
-            case INSTANCES:
-            {
-                InstanceAdapter instance = mInstanceProcessorChain.insert(db, new ContentValuesInstanceAdapter(values), isSyncAdapter);
-                rowId = instance.id();
-                result_uri = TaskContract.Instances.getContentUri(mAuthority);
-
-                postNotifyUri(Instances.getContentUri(mAuthority));
-                postNotifyUri(Tasks.getContentUri(mAuthority));
-
-                break;
-            }
+            // inserting instances is currently disabled because we only expand one instance,
+            // so even though a new task (exception) would be created, no instance might show up
+            // we need to resolve this discrepancy. Until then this feature remains disabled.
+//            case INSTANCES:
+//            {
+//                InstanceAdapter instance = mInstanceProcessorChain.insert(db, new ContentValuesInstanceAdapter(values), isSyncAdapter);
+//                rowId = instance.id();
+//                result_uri = TaskContract.Instances.getContentUri(mAuthority);
+//
+//                postNotifyUri(Instances.getContentUri(mAuthority));
+//                postNotifyUri(Tasks.getContentUri(mAuthority));
+//
+//                break;
+//            }
             case PROPERTIES:
                 String mimetype = values.getAsString(Properties.MIMETYPE);
 
