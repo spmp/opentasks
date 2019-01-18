@@ -848,7 +848,7 @@ public class TaskDatabaseHelper extends SQLiteOpenHelper
                 try (Cursor c = db.query(Tables.TASKS,
                         new String[] {
                                 TaskContract.Tasks._ID, Tasks.ORIGINAL_INSTANCE_ID, Tasks.DTSTART, Tasks.DUE, Tasks.DURATION, Tasks.IS_CLOSED, Tasks.TZ,
-                                Tasks.IS_ALLDAY, Tasks.RRULE, Tasks.RDATE, Tasks.EXDATE },
+                                Tasks.IS_ALLDAY, Tasks.RRULE, Tasks.RDATE, Tasks.EXDATE, Tasks.ORIGINAL_INSTANCE_TIME, Tasks.ORIGINAL_INSTANCE_ALLDAY },
                         String.format(Locale.ENGLISH, "%s is null", TaskContract.Tasks.ORIGINAL_INSTANCE_ID),
                         null, null, null, null))
                 {
