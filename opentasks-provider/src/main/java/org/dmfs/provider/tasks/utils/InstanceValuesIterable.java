@@ -20,10 +20,12 @@ import android.content.ContentValues;
 
 import org.dmfs.iterables.elementary.Seq;
 import org.dmfs.iterators.SingletonIterator;
+import org.dmfs.jems.iterator.decorators.Mapped;
 import org.dmfs.jems.optional.Optional;
 import org.dmfs.jems.optional.adapters.FirstPresent;
 import org.dmfs.jems.optional.composite.Zipped;
 import org.dmfs.jems.optional.elementary.NullSafe;
+import org.dmfs.jems.optional.elementary.Present;
 import org.dmfs.jems.single.Single;
 import org.dmfs.jems.single.elementary.ValueSingle;
 import org.dmfs.provider.tasks.model.TaskAdapter;
