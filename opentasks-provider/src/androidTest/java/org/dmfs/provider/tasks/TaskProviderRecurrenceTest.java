@@ -165,13 +165,13 @@ public class TaskProviderRecurrenceTest
                         new Put<>(taskList, new EmptyRowData<>()),
                         new Put<>(task,
                                 new Composite<>(
-                                        new TimeData(start, due),
+                                        new TimeData<>(start, due),
                                         new RRuleTaskData(new RecurrenceRule("FREQ=DAILY;COUNT=5", RecurrenceRule.RfcMode.RFC2445_LAX))))
 
                 ), resultsIn(mClient,
                 new Assert<>(task,
                         new Composite<>(
-                                new TimeData(start, due),
+                                new TimeData<>(start, due),
                                 new CharSequenceRowData<>(Tasks.RRULE, "FREQ=DAILY;COUNT=5"))),
 //                new Counted<>(5, new AssertRelated<>(instancesTable, Instances.TASK_ID, task)),
                 new Counted<>(1, new AssertRelated<>(instancesTable, Instances.TASK_ID, task)),
@@ -224,13 +224,13 @@ public class TaskProviderRecurrenceTest
                         new Put<>(taskList, new EmptyRowData<>()),
                         new Put<>(task,
                                 new Composite<>(
-                                        new DueData(due),
+                                        new DueData<>(due),
                                         new RRuleTaskData(new RecurrenceRule("FREQ=DAILY;COUNT=5", RecurrenceRule.RfcMode.RFC2445_LAX))))
 
                 ), resultsIn(mClient,
                 new Assert<>(task,
                         new Composite<>(
-                                new DueData(due),
+                                new DueData<>(due),
                                 new CharSequenceRowData<>(Tasks.RRULE, "FREQ=DAILY;COUNT=5"))),
 //                new Counted<>(5, new AssertRelated<>(instancesTable, Instances.TASK_ID, task)),
                 new Counted<>(1, new AssertRelated<>(instancesTable, Instances.TASK_ID, task)),
@@ -283,13 +283,13 @@ public class TaskProviderRecurrenceTest
                         new Put<>(taskList, new EmptyRowData<>()),
                         new Put<>(task,
                                 new Composite<>(
-                                        new TimeData(start),
+                                        new TimeData<>(start),
                                         new RRuleTaskData(new RecurrenceRule("FREQ=DAILY;COUNT=5", RecurrenceRule.RfcMode.RFC2445_LAX))))
 
                 ), resultsIn(mClient,
                 new Assert<>(task,
                         new Composite<>(
-                                new TimeData(start),
+                                new TimeData<>(start),
                                 new CharSequenceRowData<>(Tasks.RRULE, "FREQ=DAILY;COUNT=5"))),
 //                new Counted<>(5, new AssertRelated<>(instancesTable, Instances.TASK_ID, task)),
                 new Counted<>(1, new AssertRelated<>(instancesTable, Instances.TASK_ID, task)),
@@ -346,7 +346,7 @@ public class TaskProviderRecurrenceTest
                         new Put<>(taskList, new EmptyRowData<>()),
                         new Put<>(task,
                                 new Composite<>(
-                                        new TimeData(start, due),
+                                        new TimeData<>(start, due),
                                         new RRuleTaskData(new RecurrenceRule("FREQ=DAILY;COUNT=5", RecurrenceRule.RfcMode.RFC2445_LAX)))),
                         // remove the third instance
                         new BulkDelete<>(instancesTable,
@@ -355,7 +355,7 @@ public class TaskProviderRecurrenceTest
                 ), resultsIn(mClient,
                 new Assert<>(task,
                         new Composite<>(
-                                new TimeData(start, due),
+                                new TimeData<>(start, due),
                                 new CharSequenceRowData<>(Tasks.RRULE, "FREQ=DAILY;COUNT=5"),
                                 new CharSequenceRowData<>(Tasks.EXDATE, "20180106T123456Z"))),
                 new Counted<>(4, new AssertRelated<>(instancesTable, Instances.TASK_ID, task)),
@@ -408,23 +408,23 @@ public class TaskProviderRecurrenceTest
                         new Put<>(taskList, new EmptyRowData<>()),
                         new Put<>(task,
                                 new Composite<>(
-                                        new TimeData(start, due),
+                                        new TimeData<>(start, due),
                                         new TitleData("original"),
                                         new RRuleTaskData(new RecurrenceRule("FREQ=DAILY;COUNT=5", RecurrenceRule.RfcMode.RFC2445_LAX)))),
                         // the override moves the instance by an hour
                         new Put<>(taskOverride, new Composite<>(
-                                new TimeData(third.addDuration(hour), third.addDuration(hour).addDuration(hour)),
+                                new TimeData<>(third.addDuration(hour), third.addDuration(hour).addDuration(hour)),
                                 new TitleData("override"),
                                 new OriginalInstanceData(task, third)))
                 ), resultsIn(mClient,
                 new Assert<>(task,
                         new Composite<>(
-                                new TimeData(start, due),
+                                new TimeData<>(start, due),
                                 new CharSequenceRowData<>(Tasks.TITLE, "original"),
                                 new CharSequenceRowData<>(Tasks.RRULE, "FREQ=DAILY;COUNT=5"))),
                 new Assert<>(taskOverride,
                         new Composite<>(
-                                new TimeData(third.addDuration(hour), third.addDuration(hour).addDuration(hour)),
+                                new TimeData<>(third.addDuration(hour), third.addDuration(hour).addDuration(hour)),
                                 new CharSequenceRowData<>(Tasks.TITLE, "override"),
                                 new OriginalInstanceData(task, third))),
 //                new Counted<>(1, new AssertRelated<>(instancesTable, Instances.TASK_ID, taskOverride)),
@@ -487,7 +487,7 @@ public class TaskProviderRecurrenceTest
                         new Put<>(taskList, new EmptyRowData<>()),
                         new Put<>(task,
                                 new Composite<>(
-                                        new TimeData(start, due),
+                                        new TimeData<>(start, due),
                                         new TitleData("original"),
                                         new RRuleTaskData(new RecurrenceRule("FREQ=DAILY;COUNT=5", RecurrenceRule.RfcMode.RFC2445_LAX)))),
                         // the override just changes the title
@@ -498,13 +498,13 @@ public class TaskProviderRecurrenceTest
                 ), resultsIn(mClient,
                 new Assert<>(task,
                         new Composite<>(
-                                new TimeData(start, due),
+                                new TimeData<>(start, due),
                                 new CharSequenceRowData<>(Tasks.TITLE, "original"),
                                 new CharSequenceRowData<>(Tasks.RRULE, "FREQ=DAILY;COUNT=5"))),
                 new AssertRelated<>(tasksTable, Tasks.ORIGINAL_INSTANCE_ID, task,
                         new Composite<>(
                                 // note the task table contains the original time zone, not the default one
-                                new TimeData(third.shiftTimeZone(start.getTimeZone()), third.shiftTimeZone(start.getTimeZone()).addDuration(hour)),
+                                new TimeData<>(third.shiftTimeZone(start.getTimeZone()), third.shiftTimeZone(start.getTimeZone()).addDuration(hour)),
                                 new CharSequenceRowData<>(Tasks.TITLE, "override"),
                                 new OriginalInstanceData(task, third))),
                 new Counted<>(4, new AssertRelated<>(instancesTable, Instances.TASK_ID, task)),
@@ -561,14 +561,14 @@ public class TaskProviderRecurrenceTest
                         new Put<>(taskList, new EmptyRowData<>()),
                         new Put<>(task,
                                 new Composite<>(
-                                        new TimeData(start, due),
+                                        new TimeData<>(start, due),
                                         new RRuleTaskData(new RecurrenceRule("FREQ=DAILY;COUNT=5", RecurrenceRule.RfcMode.RFC2445_LAX)),
                                         new ExDatesTaskData(new Seq<>(third, fifth))))
 
                 ), resultsIn(mClient,
                 new Assert<>(task,
                         new Composite<>(
-                                new TimeData(start, due),
+                                new TimeData<>(start, due),
                                 new CharSequenceRowData<>(Tasks.RRULE, "FREQ=DAILY;COUNT=5"),
                                 new CharSequenceRowData<>(Tasks.EXDATE, "20180106T123456Z,20180108T123456Z"))),
 //                new Counted<>(3, new AssertRelated<>(instancesTable, Instances.TASK_ID, task)),
@@ -617,13 +617,13 @@ public class TaskProviderRecurrenceTest
                         new Put<>(taskList, new EmptyRowData<>()),
                         new Put<>(task,
                                 new Composite<>(
-                                        new TimeData(start, due),
+                                        new TimeData<>(start, due),
                                         new RDatesTaskData(new Seq<>(start, second, third, fourth, fifth))))
 
                 ), resultsIn(mClient,
                 new Assert<>(task,
                         new Composite<>(
-                                new TimeData(start, due),
+                                new TimeData<>(start, due),
                                 new CharSequenceRowData<>(Tasks.RDATE,
                                         "20180104T123456Z," +
                                                 "20180105T123456Z," +
@@ -685,7 +685,7 @@ public class TaskProviderRecurrenceTest
                         new Put<>(taskList, new EmptyRowData<>()),
                         new Put<>(task,
                                 new Composite<>(
-                                        new TimeData(start, due),
+                                        new TimeData<>(start, due),
                                         new RDatesTaskData(new Seq<>(start, second, third, fourth, fifth)))),
                         // the third instance becomed an exdate now
                         new Put<>(task,
@@ -694,7 +694,7 @@ public class TaskProviderRecurrenceTest
                 ), resultsIn(mClient,
                 new Assert<>(task,
                         new Composite<>(
-                                new TimeData(start, due),
+                                new TimeData<>(start, due),
                                 new CharSequenceRowData<>(Tasks.RDATE,
                                         "20180104T123456Z," +
                                                 "20180105T123456Z," +
@@ -760,19 +760,19 @@ public class TaskProviderRecurrenceTest
                         // first insert new task,
                         new Put<>(task,
                                 new Composite<>(
-                                        new TimeData(start, due),
+                                        new TimeData<>(start, due),
                                         new RDatesTaskData(new Seq<>(start, second, third, fourth, fifth)))),
                         // next, insert override
                         new Put<>(override,
                                 new Composite<>(
-                                        new TimeData(start, due),
+                                        new TimeData<>(start, due),
                                         new OriginalInstanceData(task, start),
-                                        new StatusData(Tasks.STATUS_COMPLETED)))
+                                        new StatusData<>(Tasks.STATUS_COMPLETED)))
 
                 ), resultsIn(mClient,
                 new Assert<>(task,
                         new Composite<>(
-                                new TimeData(start, due),
+                                new TimeData<>(start, due),
                                 new CharSequenceRowData<>(Tasks.RDATE,
                                         "20180104T123456Z," +
                                                 "20180105T123456Z," +
@@ -837,20 +837,20 @@ public class TaskProviderRecurrenceTest
                         // first insert override
                         new Put<>(override,
                                 new Composite<>(
-                                        new TimeData(start, due),
+                                        new TimeData<>(start, due),
                                         new OriginalInstanceSyncIdData("xyz", start),
-                                        new StatusData(Tasks.STATUS_COMPLETED))),
+                                        new StatusData<>(Tasks.STATUS_COMPLETED))),
                         // then insert task
                         new Put<>(task,
                                 new Composite<>(
                                         new SyncIdData("xyz"),
-                                        new TimeData(start, due),
+                                        new TimeData<>(start, due),
                                         new RDatesTaskData(new Seq<>(start, second, third, fourth, fifth))))
 
                 ), resultsIn(mClient,
                 new Assert<>(task,
                         new Composite<>(
-                                new TimeData(start, due),
+                                new TimeData<>(start, due),
                                 new SyncIdData("xyz"),
                                 new CharSequenceRowData<>(Tasks.RDATE,
                                         "20180104T123456Z," +
@@ -861,9 +861,9 @@ public class TaskProviderRecurrenceTest
                                 ))),
                 new Assert<>(override,
                         new Composite<>(
-                                new TimeData(start, due),
+                                new TimeData<>(start, due),
                                 new OriginalInstanceSyncIdData("xyz", start),
-                                new StatusData(Tasks.STATUS_COMPLETED))),
+                                new StatusData<>(Tasks.STATUS_COMPLETED))),
                 new Counted<>(1, new AssertRelated<>(instancesTable, Instances.TASK_ID, override)),
 //                new Counted<>(4, new AssertRelated<>(instancesTable, Instances.TASK_ID, task)),
                 new Counted<>(1, new AssertRelated<>(instancesTable, Instances.TASK_ID, task)),
@@ -921,7 +921,7 @@ public class TaskProviderRecurrenceTest
                         // first insert the task
                         new Put<>(task,
                                 new Composite<>(
-                                        new TimeData(start, due),
+                                        new TimeData<>(start, due),
                                         new RDatesTaskData(new Seq<>(start, second, third, fourth, fifth)))),
                         // then complete the first instance
                         new BulkUpdate<>(instancesTable, new CharSequenceRowData<>(Tasks.STATUS, String.valueOf(Tasks.STATUS_COMPLETED)),
@@ -931,7 +931,7 @@ public class TaskProviderRecurrenceTest
                 ), resultsIn(mClient,
                 new Assert<>(task,
                         new Composite<>(
-                                new TimeData(start, due),
+                                new TimeData<>(start, due),
                                 new CharSequenceRowData<>(Tasks.RDATE,
                                         "20180104T123456Z," +
                                                 "20180105T123456Z," +
@@ -943,8 +943,8 @@ public class TaskProviderRecurrenceTest
                 new Counted<>(1,
                         new BulkAssert<>(tasksTable,
                                 new Composite<>(
-                                        new TimeData(start, due),
-                                        new StatusData(Tasks.STATUS_COMPLETED)),
+                                        new TimeData<>(start, due),
+                                        new StatusData<>(Tasks.STATUS_COMPLETED)),
                                 new Not(new ReferringTo<>(Tasks._ID, task)))),
                 // and one instance which doesn't refer to the original task
                 new Counted<>(1, new BulkAssert<>(instancesTable, new Not(new ReferringTo<>(Instances.TASK_ID, task)))),

@@ -62,6 +62,7 @@ public final class TaskValueDelegate implements EntityProcessor<InstanceAdapter>
             TaskAdapter.SYNC_ID,
             TaskAdapter.SYNC_VERSION,
             // unset any list and read-only fields
+            TaskAdapter.VERSION,
             TaskAdapter.ACCOUNT_NAME,
             TaskAdapter.ACCOUNT_TYPE,
             TaskAdapter.LIST_VISIBLE,

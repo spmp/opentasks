@@ -259,11 +259,11 @@ public class RelationHandler extends PropertyHandler
         }
         // else if (type == Relation.RELTYPE_SIBLING)
         // {
-            /*
-             * This was a link to a sibling, since it's no longer our sibling either it or we're orphaned now We won't know unless we check all relations.
-             *
-             * FIXME: properly handle this case
-             */
+        /*
+         * This was a link to a sibling, since it's no longer our sibling either it or we're orphaned now We won't know unless we check all relations.
+         *
+         * FIXME: properly handle this case
+         */
         // }
     }
 }

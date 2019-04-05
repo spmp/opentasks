@@ -275,7 +275,7 @@ public class TaskProviderInstancesTest
                 new Put<>(task,
                         new Composite<>(
                                 new Referring<>(Tasks.LIST_ID, taskList),
-                                new TimeData(dateTime),
+                                new TimeData<>(dateTime),
                                 new TitleData("task1"))),
                 new Put<>(instance,
                         new Composite<>(

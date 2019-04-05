@@ -831,6 +831,7 @@ public final class TaskProvider extends SQLiteContentProvider implements OnAccou
                     while (cursor.moveToNext())
                     {
                         mInstanceProcessorChain.delete(db, new CursorContentValuesInstanceAdapter(cursor, new ContentValues()), isSyncAdapter);
+                        mChanged.set(true);
                         count++;
                     }
                 }
@@ -1142,6 +1143,10 @@ public final class TaskProvider extends SQLiteContentProvider implements OnAccou
                                 cursor.getCount() > 1 ? new ContentValues(values) : values);
 
                         mInstanceProcessorChain.update(db, instance, isSyncAdapter);
+                        if (dataChanged && instance.hasUpdates())
+                        {
+                            mChanged.set(true);
+                        }
                         count++;
                     }
                 }

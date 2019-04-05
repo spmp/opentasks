@@ -39,10 +39,10 @@ import org.dmfs.tasks.utils.Update;
  */
 public final class UpdateAction implements TaskAction
 {
-    private final Function<RowDataSnapshot<TaskContract.Instances>, RowData<TaskContract.Tasks>> mDataFunction;
+    private final Function<RowDataSnapshot<TaskContract.Instances>, RowData<TaskContract.Instances>> mDataFunction;
 
 
-    public UpdateAction(Function<RowDataSnapshot<TaskContract.Instances>, RowData<TaskContract.Tasks>> dataFunction)
+    public UpdateAction(Function<RowDataSnapshot<TaskContract.Instances>, RowData<TaskContract.Instances>> dataFunction)
     {
         mDataFunction = dataFunction;
     }
