@@ -134,7 +134,7 @@
                 <data
                         android:scheme="content"
                         android:host="@string/opentasks_authority"
-                        android:mimeType="vnd.android.cursor.dir/org.dmfs.tasks.instaces"/>
+                        android:mimeType="vnd.android.cursor.dir/org.dmfs.tasks.instances"/>
                 <data
                         android:scheme="content"
                         android:host="@string/opentasks_authority"
@@ -364,6 +364,10 @@
                         android:host="@string/opentasks_authority"
                         android:mimeType="vnd.android.cursor.item/org.dmfs.tasks.tasks"
                         android:scheme="content"/>
+                <data
+                        android:host="@string/opentasks_authority"
+                        android:mimeType="vnd.android.cursor.item/org.dmfs.tasks.instances"
+                        android:scheme="content"/>
             </intent-filter>
             <intent-filter>
                 <action android:name="org.dmfs.android.tasks.TASK_START"/>
@@ -371,6 +375,10 @@
                 <data
                         android:host="@string/opentasks_authority"
                         android:mimeType="vnd.android.cursor.item/org.dmfs.tasks.tasks"
+                        android:scheme="content"/>
+                <data
+                        android:host="@string/opentasks_authority"
+                        android:mimeType="vnd.android.cursor.item/org.dmfs.tasks.instances"
                         android:scheme="content"/>
             </intent-filter>
         </receiver>

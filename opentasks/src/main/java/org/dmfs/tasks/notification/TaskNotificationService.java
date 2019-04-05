@@ -17,7 +17,6 @@
 package org.dmfs.tasks.notification;
 
 import android.app.Notification;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ContentUris;
 import android.content.Context;
@@ -26,14 +25,10 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.app.JobIntentService;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationCompat.Builder;
 import android.support.v4.app.NotificationManagerCompat;
 
-import org.dmfs.android.contentpal.Projection;
 import org.dmfs.android.contentpal.predicates.AnyOf;
 import org.dmfs.android.contentpal.predicates.EqArg;
-import org.dmfs.android.contentpal.projections.Composite;
 import org.dmfs.android.contentpal.rowsets.QueryRowSet;
 import org.dmfs.android.contentpal.views.Sorted;
 import org.dmfs.jems.iterable.composite.Diff;
@@ -42,20 +37,17 @@ import org.dmfs.jems.pair.Pair;
 import org.dmfs.opentaskspal.readdata.Id;
 import org.dmfs.opentaskspal.readdata.TaskPin;
 import org.dmfs.opentaskspal.readdata.TaskVersion;
-import org.dmfs.opentaskspal.views.TasksView;
+import org.dmfs.opentaskspal.views.InstancesView;
 import org.dmfs.optional.Optional;
-import org.dmfs.provider.tasks.AuthorityUtil;
 import org.dmfs.tasks.JobIds;
 import org.dmfs.tasks.R;
 import org.dmfs.tasks.actions.utils.NotificationPrefs;
+import org.dmfs.tasks.contract.TaskContract;
 import org.dmfs.tasks.contract.TaskContract.Tasks;
-import org.dmfs.tasks.model.ContentSet;
 import org.dmfs.tasks.notification.state.PrefState;
 import org.dmfs.tasks.notification.state.RowState;
 import org.dmfs.tasks.notification.state.TaskNotificationState;
 import org.dmfs.tasks.utils.In;
-
-import java.util.ArrayList;
 
 
 /**
@@ -65,7 +57,6 @@ import java.util.ArrayList;
  */
 public class TaskNotificationService extends JobIntentService
 {
-
     public static void enqueueWork(@NonNull Context context, @NonNull Intent work)
     {
         enqueueWork(context, TaskNotificationService.class, JobIds.NOTIFICATION_SERVICE, work);
@@ -110,7 +101,7 @@ public class TaskNotificationService extends JobIntentService
                 String authority = getString(R.string.opentasks_authority);
 
                 Iterable<TaskNotificationState> currentNotifications = new org.dmfs.tasks.utils.Sorted<>(
-                        (o, o2) -> (int) (ContentUris.parseId(o.task()) - ContentUris.parseId(o2.task())),
+                        (o, o2) -> (int) (ContentUris.parseId(o.instance()) - ContentUris.parseId(o2.instance())),
                         new Mapped<>(
                                 PrefState::new,
                                 mNotificationPrefs.getAll().entrySet()));
@@ -119,23 +110,24 @@ public class TaskNotificationService extends JobIntentService
                         currentNotifications,
                         new Mapped<>(snapShot -> new RowState(authority, snapShot.values()),
                                 new QueryRowSet<>(
-                                        new Sorted<>(Tasks._ID, new TasksView(authority, getContentResolver().acquireContentProviderClient(authority))),
-                                        new Composite<>((Projection<Tasks>) Id.PROJECTION, TaskVersion.PROJECTION, TaskPin.PROJECTION),
+                                        new Sorted<>(TaskContract.Instances._ID,
+                                                new InstancesView<>(authority, getContentResolver().acquireContentProviderClient(authority))),
+                                        new Composite<>(Id.PROJECTION, TaskVersion.PROJECTION, TaskPin.PROJECTION),
                                         new AnyOf(
                                                 new EqArg(Tasks.PINNED, 1),
-                                                new In(Tasks._ID, new Mapped<>(p -> ContentUris.parseId(p.task()), currentNotifications))))),
+                                                new In(Tasks._ID, new Mapped<>(p -> ContentUris.parseId(p.instance()), currentNotifications))))),
                         // NOTE due to a bug in diff, the logic is currently reversed
-                        (o, o2) -> (int) (ContentUris.parseId(o2.task()) - ContentUris.parseId(o.task()))))
+                        (o, o2) -> (int) (ContentUris.parseId(o2.instance()) - ContentUris.parseId(o.instance()))))
                 {
                     if (!diff.left().isPresent())
                     {
                         // new task not notified yet, must be pinned
-                        ActionService.startAction(this, ActionService.ACTION_RENOTIFY, diff.right().value().task());
+                        ActionService.startAction(this, ActionService.ACTION_RENOTIFY, diff.right().value().instance());
                     }
                     else if (!diff.right().isPresent())
                     {
                         // task no longer present, remove notification
-                        removeTaskNotification(diff.left().value().task());
+                        removeTaskNotification(diff.left().value().instance());
                     }
                     else
                     {
@@ -147,12 +139,12 @@ public class TaskNotificationService extends JobIntentService
                              */
                             if (diff.right().value().ongoing())
                             {
-                                ActionService.startAction(this, ActionService.ACTION_RENOTIFY, diff.left().value().task());
+                                ActionService.startAction(this, ActionService.ACTION_RENOTIFY, diff.left().value().instance());
                             }
                             else if (diff.left().value().ongoing())
                             {
                                 // task has been unpinned
-                                removeTaskNotification(diff.left().value().task());
+                                removeTaskNotification(diff.left().value().instance());
                             }
                         }
                     }

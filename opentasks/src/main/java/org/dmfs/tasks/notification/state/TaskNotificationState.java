@@ -24,7 +24,7 @@ import android.net.Uri;
  */
 public interface TaskNotificationState
 {
-    Uri task();
+    Uri instance();
 
     int taskVersion();
 

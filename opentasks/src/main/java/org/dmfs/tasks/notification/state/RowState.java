@@ -34,10 +34,10 @@ import org.dmfs.tasks.contract.TaskContract;
 public final class RowState implements TaskNotificationState
 {
     private final String mAuthority;
-    private final RowDataSnapshot<TaskContract.Tasks> mRow;
+    private final RowDataSnapshot<? extends TaskContract.Instances> mRow;
 
 
-    public RowState(String authority, RowDataSnapshot<TaskContract.Tasks> row)
+    public RowState(String authority, RowDataSnapshot<? extends TaskContract.Instances> row)
     {
         mAuthority = authority;
         mRow = row;
@@ -45,9 +45,9 @@ public final class RowState implements TaskNotificationState
 
 
     @Override
-    public Uri task()
+    public Uri instance()
     {
-        return ContentUris.withAppendedId(TaskContract.Tasks.getContentUri(mAuthority), new Id(mRow).value());
+        return ContentUris.withAppendedId(TaskContract.Instances.getContentUri(mAuthority), new Id(mRow).value());
     }
 
 

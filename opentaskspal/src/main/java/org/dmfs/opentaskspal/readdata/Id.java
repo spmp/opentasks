@@ -25,6 +25,7 @@ import org.dmfs.android.contentpal.projections.SingleColProjection;
 import org.dmfs.jems.single.Single;
 import org.dmfs.jems.single.decorators.DelegatingSingle;
 import org.dmfs.jems.single.elementary.ValueSingle;
+import org.dmfs.tasks.contract.TaskContract;
 
 
 /**
@@ -34,7 +35,7 @@ import org.dmfs.jems.single.elementary.ValueSingle;
  */
 public final class Id extends DelegatingSingle<Long>
 {
-    public static final Projection<?> PROJECTION = new SingleColProjection<>(BaseColumns._ID);
+    public static final Projection<? super BaseColumns> PROJECTION = new SingleColProjection<>(BaseColumns._ID);
 
 
     public Id(@NonNull RowDataSnapshot<?> rowDataSnapshot)
